@@ -76,7 +76,7 @@ func execInsert(m *model.ACL, stmt *sql.Stmt) error {
 	return err
 }
 
-func GetOne(uid string) (tx *sql.Tx, *model.ACL, error) {
+func GetOne(tx *sql.Tx, uid string) (*model.ACL, error) {
 	r := &model.ACL{}
 	row := tx.QueryRow(selectQuery+"WHERE uid = unhex(?)", uid)
 
