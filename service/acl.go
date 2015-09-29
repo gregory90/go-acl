@@ -10,12 +10,10 @@ import (
 	groupS "bitbucket.org/pqstudio/go-user-group/service"
 
 	"bitbucket.org/pqstudio/go-webutils"
-
-	//. "bitbucket.org/pqstudio/go-webutils/logger"
 )
 
-func GetOne(uid string) (*model.ACL, error) {
-	r, err := datastore.GetOne(uid)
+func GetOne(tx *sql.Tx, uid string) (*model.ACL, error) {
+	r, err := datastore.GetOne(tx, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -23,8 +21,8 @@ func GetOne(uid string) (*model.ACL, error) {
 	return r, nil
 }
 
-func Check(userUID string, object string, permission string, action string) (bool, error) {
-	gr, err := groupS.GetByUserUID(userUID, 100, 0)
+func Check(tx *sql.Tx, userUID string, object string, permission string, action string) (bool, error) {
+	gr, err := groupS.GetByUserUID(tx, userUID, 100, 0)
 	if err != nil {
 		return false, err
 	}
@@ -34,8 +32,8 @@ func Check(userUID string, object string, permission string, action string) (boo
 	return allowed, err
 }
 
-func CheckGroup(userUID string, group string) (bool, error) {
-	grs, err := groupS.GetByUserUID(userUID, 100, 0)
+func CheckGroup(tx *sql.Tx, userUID string, group string) (bool, error) {
+	grs, err := groupS.GetByUserUID(tx, userUID, 100, 0)
 	if err != nil {
 		return false, err
 	}
@@ -48,10 +46,10 @@ func CheckGroup(userUID string, group string) (bool, error) {
 	return false, nil
 }
 
-func CheckGroups(groups []groupModel.Group, object string, permission string, action string) (bool, error) {
+func CheckGroups(tx *sql.Tx, groups []groupModel.Group, object string, permission string, action string) (bool, error) {
 	var e error
 	for _, group := range groups {
-		_, err := datastore.GetByGroupIDPermissionAndAction(group.Name, object, permission, action)
+		_, err := datastore.GetByGroupIDPermissionAndAction(tx, group.Name, object, permission, action)
 
 		if err != nil {
 			e = err
@@ -64,11 +62,11 @@ func CheckGroups(groups []groupModel.Group, object string, permission string, ac
 	return false, e
 }
 
-func CreateFromModel(m *model.ACL) error {
+func CreateFromModel(tx *sql.Tx, m *model.ACL) error {
 	m.UID = utils.NewUUID()
 	m.CreatedAt = time.Now().UTC()
 
-	err := datastore.Create(m)
+	err := datastore.Create(tx, m)
 	if err != nil {
 		return err
 	}
@@ -76,7 +74,7 @@ func CreateFromModel(m *model.ACL) error {
 	return nil
 }
 
-func Create(userID string, objectID string, permission string, actions []string) error {
+func Create(tx *sql.Tx, userID string, objectID string, permission string, actions []string) error {
 
 	var e error
 
@@ -88,7 +86,7 @@ func Create(userID string, objectID string, permission string, actions []string)
 			Action:     action,
 		}
 
-		err := CreateFromModel(acl)
+		err := CreateFromModel(tx, acl)
 		if err != nil {
 			e = err
 			continue
@@ -98,8 +96,8 @@ func Create(userID string, objectID string, permission string, actions []string)
 	return e
 }
 
-func Update(m *model.ACL) error {
-	err := datastore.Update(m)
+func Update(tx *sql.Tx, m *model.ACL) error {
+	err := datastore.Update(tx, m)
 	if err != nil {
 		return err
 	}
@@ -107,8 +105,8 @@ func Update(m *model.ACL) error {
 	return nil
 }
 
-func Delete(uid string) error {
-	err := datastore.Delete(uid)
+func Delete(tx *sql.Tx, uid string) error {
+	err := datastore.Delete(tx, uid)
 	if err != nil {
 		return err
 	}

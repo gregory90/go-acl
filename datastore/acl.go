@@ -4,9 +4,6 @@ import (
 	"database/sql"
 
 	"bitbucket.org/pqstudio/go-acl/model"
-
-	. "bitbucket.org/pqstudio/go-acl/db"
-	. "bitbucket.org/pqstudio/go-webutils/logger"
 )
 
 const (
@@ -79,9 +76,9 @@ func execInsert(m *model.ACL, stmt *sql.Stmt) error {
 	return err
 }
 
-func GetOne(uid string) (*model.ACL, error) {
+func GetOne(uid string) (tx *sql.Tx, *model.ACL, error) {
 	r := &model.ACL{}
-	row := DB.QueryRow(selectQuery+"WHERE uid = unhex(?)", uid)
+	row := tx.QueryRow(selectQuery+"WHERE uid = unhex(?)", uid)
 
 	err := scanSelectSingle(r, row)
 	if err != nil {
@@ -91,23 +88,20 @@ func GetOne(uid string) (*model.ACL, error) {
 	return r, nil
 }
 
-func GetByGroupIDPermissionAndAction(groupID string, object string, permission string, action string) (*model.ACL, error) {
+func GetByGroupIDPermissionAndAction(tx *sql.Tx, groupID string, object string, permission string, action string) (*model.ACL, error) {
 	r := &model.ACL{}
-	Log.Debug(groupID + " " + object + " " + permission + " " + action)
-	row := DB.QueryRow(selectQuery+"WHERE groupID = ? AND objectID = unhex(?) AND permission = ? AND action = ?", groupID, object, permission, action)
+	row := tx.QueryRow(selectQuery+"WHERE groupID = ? AND objectID = unhex(?) AND permission = ? AND action = ?", groupID, object, permission, action)
 
 	err := scanSelectSingle(r, row)
 	if err != nil {
-		Log.Debug("%+v", err)
 		return nil, err
 	}
-	Log.Debug("%+v", r)
 
 	return r, nil
 }
 
-func Create(m *model.ACL) error {
-	stmt, err := DB.Prepare(insertQuery)
+func Create(tx *sql.Tx, m *model.ACL) error {
+	stmt, err := tx.Prepare(insertQuery)
 	if err != nil {
 		return err
 	}
@@ -118,8 +112,8 @@ func Create(m *model.ACL) error {
 	return err
 }
 
-func Update(m *model.ACL) error {
-	stmt, err := DB.Prepare(updateQuery + "WHERE uid=unhex(?)")
+func Update(tx *sql.Tx, m *model.ACL) error {
+	stmt, err := tx.Prepare(updateQuery + "WHERE uid=unhex(?)")
 	if err != nil {
 		return err
 	}
@@ -129,8 +123,8 @@ func Update(m *model.ACL) error {
 	return err
 }
 
-func Delete(uid string) error {
-	stmt, err := DB.Prepare(deleteQuery + "WHERE uid=unhex(?)")
+func Delete(tx *sql.Tx, uid string) error {
+	stmt, err := tx.Prepare(deleteQuery + "WHERE uid=unhex(?)")
 	if err != nil {
 		return err
 	}
