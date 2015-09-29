@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"time"
 
 	"bitbucket.org/pqstudio/go-acl/datastore"
