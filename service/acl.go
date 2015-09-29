@@ -40,7 +40,7 @@ func Check(db *sql.DB, userUID string, object string, permission string, action 
 }
 
 func CheckGroup(db *sql.DB, userUID string, group string) (bool, error) {
-	var gr interface{}
+	var grs interface{}
 	err := Transact(db, func(tx *sql.Tx) error {
 		var err error
 		grs, err = groupS.GetByUserUID(tx, userUID, 100, 0)
