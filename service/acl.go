@@ -24,23 +24,23 @@ func GetOne(db *sql.DB, uid string) (*model.ACL, error) {
 }
 
 func Check(db *sql.DB, userUID string, object string, permission string, action string) (bool, error) {
-	var gr interface{}
+	var grs []interface{}
 	err := Transact(db, func(tx *sql.Tx) error {
 		var err error
-		gr, err = groupS.GetByUserUID(tx, userUID, 100, 0)
+		grs, err = groupS.GetByUserUID(tx, userUID, 100, 0)
 		return err
 	})
 	if err != nil {
 		return false, err
 	}
 
-	allowed, err := CheckGroups(db, gr, object, permission, action)
+	allowed, err := CheckGroups(db, grs, object, permission, action)
 
 	return allowed, err
 }
 
 func CheckGroup(db *sql.DB, userUID string, group string) (bool, error) {
-	var grs interface{}
+	var grs []interface{}
 	err := Transact(db, func(tx *sql.Tx) error {
 		var err error
 		grs, err = groupS.GetByUserUID(tx, userUID, 100, 0)
