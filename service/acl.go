@@ -34,18 +34,18 @@ func Check(db *sql.DB, userUID string, object string, permission string, action 
 		return false, err
 	}
 
-	var allowed bool
-	err := Transact(db, func(tx *sql.Tx) error {
-		var err error
-		allowed, err = CheckGroups(tx, gr, object, permission, action)
-		return err
-	})
+	allowed, err := CheckGroups(db, gr, object, permission, action)
 
 	return allowed, err
 }
 
 func CheckGroup(db *sql.DB, userUID string, group string) (bool, error) {
-	grs, err := groupS.GetByUserUID(db, userUID, 100, 0)
+	var gr interface{}
+	err := Transact(db, func(tx *sql.Tx) error {
+		var err error
+		grs, err = groupS.GetByUserUID(tx, userUID, 100, 0)
+		return err
+	})
 	if err != nil {
 		return false, err
 	}
