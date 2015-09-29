@@ -28,7 +28,7 @@ func Check(tx *sql.Tx, userUID string, object string, permission string, action 
 		return false, err
 	}
 
-	allowed, err := CheckGroups(gr, object, permission, action)
+	allowed, err := CheckGroups(tx, gr, object, permission, action)
 
 	return allowed, err
 }
