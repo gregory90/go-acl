@@ -24,7 +24,7 @@ func GetOne(db *sql.DB, uid string) (*model.ACL, error) {
 }
 
 func Check(db *sql.DB, userUID string, object string, permission string, action string) (bool, error) {
-	var grs []interface{}
+	var grs []groupModel.Group
 	err := Transact(db, func(tx *sql.Tx) error {
 		var err error
 		grs, err = groupS.GetByUserUID(tx, userUID, 100, 0)
@@ -40,7 +40,7 @@ func Check(db *sql.DB, userUID string, object string, permission string, action 
 }
 
 func CheckGroup(db *sql.DB, userUID string, group string) (bool, error) {
-	var grs []interface{}
+	var grs []groupModel.Group
 	err := Transact(db, func(tx *sql.Tx) error {
 		var err error
 		grs, err = groupS.GetByUserUID(tx, userUID, 100, 0)
