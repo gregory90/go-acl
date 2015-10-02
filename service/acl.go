@@ -11,7 +11,6 @@ import (
 	groupS "bitbucket.org/pqstudio/go-user-group/service"
 
 	"bitbucket.org/pqstudio/go-webutils"
-	. "bitbucket.org/pqstudio/go-webutils/db"
 )
 
 func GetOne(tx *sql.Tx, uid string) (*model.ACL, error) {
@@ -29,7 +28,7 @@ func Check(tx *sql.Tx, userUID string, object string, permission string, action 
 		return false, err
 	}
 
-	allowed, err := CheckGroups(db, grs, object, permission, action)
+	allowed, err := CheckGroups(tx, grs, object, permission, action)
 
 	return allowed, err
 }
