@@ -76,9 +76,9 @@ func execInsert(m *model.ACL, stmt *sql.Stmt) error {
 	return err
 }
 
-func GetOne(db *sql.DB, uid string) (*model.ACL, error) {
+func GetOne(tx *sql.Tx, uid string) (*model.ACL, error) {
 	r := &model.ACL{}
-	row := db.QueryRow(selectQuery+"WHERE uid = unhex(?)", uid)
+	row := tx.QueryRow(selectQuery+"WHERE uid = unhex(?)", uid)
 
 	err := scanSelectSingle(r, row)
 	if err != nil {
@@ -88,9 +88,9 @@ func GetOne(db *sql.DB, uid string) (*model.ACL, error) {
 	return r, nil
 }
 
-func GetByGroupIDPermissionAndAction(db *sql.DB, groupID string, object string, permission string, action string) (*model.ACL, error) {
+func GetByGroupIDPermissionAndAction(tx *sql.Tx, groupID string, object string, permission string, action string) (*model.ACL, error) {
 	r := &model.ACL{}
-	row := db.QueryRow(selectQuery+"WHERE groupID = ? AND objectID = unhex(?) AND permission = ? AND action = ?", groupID, object, permission, action)
+	row := tx.QueryRow(selectQuery+"WHERE groupID = ? AND objectID = unhex(?) AND permission = ? AND action = ?", groupID, object, permission, action)
 
 	err := scanSelectSingle(r, row)
 	if err != nil {
@@ -100,8 +100,8 @@ func GetByGroupIDPermissionAndAction(db *sql.DB, groupID string, object string, 
 	return r, nil
 }
 
-func Create(db *sql.DB, m *model.ACL) error {
-	stmt, err := db.Prepare(insertQuery)
+func Create(tx *sql.Tx, m *model.ACL) error {
+	stmt, err := tx.Prepare(insertQuery)
 	if err != nil {
 		return err
 	}
@@ -112,8 +112,8 @@ func Create(db *sql.DB, m *model.ACL) error {
 	return err
 }
 
-func Update(db *sql.DB, m *model.ACL) error {
-	stmt, err := db.Prepare(updateQuery + "WHERE uid=unhex(?)")
+func Update(tx *sql.Tx, m *model.ACL) error {
+	stmt, err := tx.Prepare(updateQuery + "WHERE uid=unhex(?)")
 	if err != nil {
 		return err
 	}
@@ -123,8 +123,8 @@ func Update(db *sql.DB, m *model.ACL) error {
 	return err
 }
 
-func Delete(db *sql.DB, uid string) error {
-	stmt, err := db.Prepare(deleteQuery + "WHERE uid=unhex(?)")
+func Delete(tx *sql.Tx, uid string) error {
+	stmt, err := tx.Prepare(deleteQuery + "WHERE uid=unhex(?)")
 	if err != nil {
 		return err
 	}
