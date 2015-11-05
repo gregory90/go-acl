@@ -4,13 +4,13 @@ import (
 	"database/sql"
 	"time"
 
-	"bitbucket.org/pqstudio/go-acl/datastore"
-	"bitbucket.org/pqstudio/go-acl/model"
+	"github.com/gregory90/go-acl/datastore"
+	"github.com/gregory90/go-acl/model"
 
-	groupModel "bitbucket.org/pqstudio/go-user-group/model"
-	groupS "bitbucket.org/pqstudio/go-user-group/service"
+	groupModel "github.com/gregory90/go-user-group/model"
+	groupS "github.com/gregory90/go-user-group/service"
 
-	"bitbucket.org/pqstudio/go-webutils"
+	"github.com/gregory90/go-webutils"
 )
 
 func GetOne(tx *sql.Tx, uid string) (*model.ACL, error) {

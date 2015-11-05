@@ -3,7 +3,7 @@ package datastore
 import (
 	"database/sql"
 
-	"bitbucket.org/pqstudio/go-acl/model"
+	"github.com/gregory90/go-acl/model"
 )
 
 const (
